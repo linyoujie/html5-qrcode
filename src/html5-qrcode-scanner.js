@@ -200,7 +200,9 @@ class Html5QrcodeScanner {
         header.style.textAlign = "left";
         header.style.margin = "0px";
         header.style.padding = "5px";
-        header.style.fontSize = "20px";
+        // header.style.fontSize = "20px";
+        header.style.fontSize = "5vw";
+
         header.style.borderBottom = "1px solid rgba(192, 192, 192, 0.18)";
         dashboard.appendChild(header);
 
@@ -212,7 +214,8 @@ class Html5QrcodeScanner {
         statusSpan.id = this.__getStatusSpanId();
         statusSpan.style.float = "right";
         statusSpan.style.padding = "5px 7px";
-        statusSpan.style.fontSize = "14px";
+        statusSpan.style.fontSize = "4vw";        
+        // statusSpan.style.fontSize = "14px";
         statusSpan.style.background = "#dedede6b";
         statusSpan.style.border = "1px solid #00000000";
         statusSpan.style.color = "rgb(17, 17, 17)";
@@ -222,7 +225,9 @@ class Html5QrcodeScanner {
         const headerMessageContainer = document.createElement("div");
         headerMessageContainer.id = this.__getHeaderMessageContainerId();
         headerMessageContainer.style.display = "none";
-        headerMessageContainer.style.fontSize = "14px";
+        // headerMessageContainer.style.fontSize = "14px";
+        headerMessageContainer.style.fontSize = "4vw";
+
         headerMessageContainer.style.padding = "2px 10px";
         headerMessageContainer.style.marginTop = "4px";
         headerMessageContainer.style.borderTop = "1px solid #f6f6f6";
@@ -233,7 +238,9 @@ class Html5QrcodeScanner {
         const section = document.createElement("div");
         section.id = this.__getDashboardSectionId();
         section.style.width = "100%";
-        section.style.padding = "10px";
+        section.style.padding = "0px";
+        // section.style.padding = "10px";
+
         section.style.textAlign = "left";
         dashboard.appendChild(section);
     }
@@ -256,7 +263,7 @@ class Html5QrcodeScanner {
 
         const requestPermissionButton = document.createElement("button");
         requestPermissionButton.innerHTML = "Request Camera Permissions";
-        requestPermissionButton.addEventListener("click", function () {
+        // requestPermissionButton.addEventListener("click", function () {
             requestPermissionButton.disabled = true;
             $this.__setStatus("PERMISSION");
             $this.__setHeaderMessage("Requesting camera permissions...");
@@ -276,7 +283,7 @@ class Html5QrcodeScanner {
                 $this.__setStatus("IDLE");
                 $this.__setHeaderMessage(error, Html5QrcodeScanner.STATUS_WARNING);
             });
-        });
+        // });
         requestPermissionContainer.appendChild(requestPermissionButton);
         scpCameraScanRegion.appendChild(requestPermissionContainer);
 
@@ -330,10 +337,13 @@ class Html5QrcodeScanner {
         cameraSelectionContainer.innerHTML
             = `Select Camera (${cameras.length}) &nbsp;`;
         cameraSelectionContainer.style.marginRight = "10px";
+        cameraSelectionContainer.style.fontSize = "4vw";
 
         const cameraSelectionSelect = document.createElement("select");
         cameraSelectionSelect.id = this.__getCameraSelectionId();
-        for (var i = 0; i < cameras.length; i++) {
+        cameraSelectionSelect.style.fontSize = "4vw";
+
+        for (var i = cameras.length-1; i >= 0; i--) {
             const camera = cameras[i];
             const value = camera.id;
             const name = camera.label == null ? value : camera.label;
@@ -347,16 +357,48 @@ class Html5QrcodeScanner {
 
         const cameraActionContainer = document.createElement("span");
         const cameraActionStartButton = document.createElement("button");
+        cameraActionStartButton.style.fontSize = "4vw";
         cameraActionStartButton.innerHTML = "Start Scanning";
         cameraActionContainer.appendChild(cameraActionStartButton);
 
         const cameraActionStopButton = document.createElement("button");
         cameraActionStopButton.innerHTML = "Stop Scanning";
         cameraActionStopButton.style.display = "none";
+        cameraActionStopButton.style.fontSize = "4vw";
         cameraActionStopButton.disabled = true;
         cameraActionContainer.appendChild(cameraActionStopButton);
 
         scpCameraScanRegion.appendChild(cameraActionContainer);
+
+        // cameraActionStartButton.addEventListener('click', _ => {
+            cameraSelectionSelect.disabled = true;
+            cameraActionStartButton.disabled = true;
+            $this._showHideScanTypeSwapLink(false);
+
+            const config = $this.config ?
+                $this.config : { fps: 10, qrbox: 250 };
+
+            const cameraId = cameraSelectionSelect.value;
+            $this.html5Qrcode.start(
+                cameraId,
+                config,
+                $this.qrCodeSuccessCallback,
+                $this.qrCodeErrorCallback)
+                .then(_ => {
+                    cameraActionStopButton.disabled = false;
+                    cameraActionStopButton.style.display = "inline-block";
+                    cameraActionStartButton.style.display = "none";
+                    $this.__setStatus("Scanning");
+                })
+                .catch(error => {
+                    $this._showHideScanTypeSwapLink(true);
+                    cameraSelectionSelect.disabled = false;
+                    cameraActionStartButton.disabled = false;
+                    $this.__setStatus("IDLE");
+                    $this.__setHeaderMessage(
+                        error, Html5QrcodeScanner.STATUS_WARNING);
+                });
+        // });
 
         cameraActionStartButton.addEventListener('click', _ => {
             cameraSelectionSelect.disabled = true;

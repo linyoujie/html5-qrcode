@@ -297,7 +297,40 @@ var Html5Qrcode = /*#__PURE__*/function () {
             _this._context.scale(-1, 1);
 
             scanContext();
+          } // 二次扫描 for barcode
+
+
+          $this._context.drawImage($this._videoElement,
+          /* sx= */
+          sxOffset,
+          /* sy= */
+          syOffset,
+          /* sWidth= */
+          sWidthOffset,
+          /* sHeight= */
+          sHeightOffset,
+          /* dx= */
+          0,
+          /* dy= */
+          $this._qrRegion.height / 1.5,
+          /* dWidth= */
+          $this._qrRegion.width,
+          /* dHeight= */
+          $this._qrRegion.height / 3); // Try scanning normal frame and in case of failure, scan
+          // the inverted context if not explictly disabled.
+          // TODO(mebjas): Move this logic to qrcode.js
+
+
+          if (!scanContext() && config.disableFlip !== true) {
+            // scan inverted context.
+            _this._context.translate(_this._context.canvas.width, 0);
+
+            _this._context.scale(-1, 1);
+
+            scanContext();
           }
+
+          scanContext();
         }
 
         $this._foreverScanTimeout = setTimeout(foreverScan, Html5Qrcode._getTimeoutFps(config.fps));
@@ -767,7 +800,19 @@ var Html5Qrcode = /*#__PURE__*/function () {
       shadingElement.style.bottom = "0px";
       shadingElement.style.left = "0px";
       shadingElement.style.right = "0px";
-      shadingElement.id = "".concat(Html5Qrcode.SHADED_REGION_CLASSNAME); // Check if div is too small for shadows. As there are two 5px width borders the needs to have a size above 10px.
+      shadingElement.id = "".concat(Html5Qrcode.SHADED_REGION_CLASSNAME);
+      var shadingElement2 = document.createElement('div');
+      shadingElement2.style.position = "absolute";
+      shadingElement2.style.borderLeft = "".concat((width - qrboxSize) / 2, "px solid #0000007a");
+      shadingElement2.style.borderRight = "".concat((width - qrboxSize) / 2, "px solid #0000007a");
+      shadingElement2.style.borderTop = "".concat(20, "px solid #0000007a");
+      shadingElement2.style.borderBottom = "".concat(20, "px solid #0000007a");
+      shadingElement2.style.boxSizing = "border-box";
+      shadingElement2.style.top = "0px";
+      shadingElement2.style.bottom = "0px";
+      shadingElement2.style.left = "0px";
+      shadingElement2.style.right = "0px";
+      shadingElement2.id = "".concat(Html5Qrcode.SHADED_REGION_CLASSNAME); // Check if div is too small for shadows. As there are two 5px width borders the needs to have a size above 10px.
 
       if (width - qrboxSize < 11 || height - qrboxSize < 11) {
         this.hasBorderShaders = false;

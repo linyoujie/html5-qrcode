@@ -225,8 +225,9 @@ var Html5QrcodeScanner = /*#__PURE__*/function () {
       var header = document.createElement("div");
       header.style.textAlign = "left";
       header.style.margin = "0px";
-      header.style.padding = "5px";
-      header.style.fontSize = "20px";
+      header.style.padding = "5px"; // header.style.fontSize = "20px";
+
+      header.style.fontSize = "5vw";
       header.style.borderBottom = "1px solid rgba(192, 192, 192, 0.18)";
       dashboard.appendChild(header);
       var titleSpan = document.createElement("span");
@@ -236,7 +237,8 @@ var Html5QrcodeScanner = /*#__PURE__*/function () {
       statusSpan.id = this.__getStatusSpanId();
       statusSpan.style["float"] = "right";
       statusSpan.style.padding = "5px 7px";
-      statusSpan.style.fontSize = "14px";
+      statusSpan.style.fontSize = "4vw"; // statusSpan.style.fontSize = "14px";
+
       statusSpan.style.background = "#dedede6b";
       statusSpan.style.border = "1px solid #00000000";
       statusSpan.style.color = "rgb(17, 17, 17)";
@@ -246,8 +248,9 @@ var Html5QrcodeScanner = /*#__PURE__*/function () {
 
       var headerMessageContainer = document.createElement("div");
       headerMessageContainer.id = this.__getHeaderMessageContainerId();
-      headerMessageContainer.style.display = "none";
-      headerMessageContainer.style.fontSize = "14px";
+      headerMessageContainer.style.display = "none"; // headerMessageContainer.style.fontSize = "14px";
+
+      headerMessageContainer.style.fontSize = "4vw";
       headerMessageContainer.style.padding = "2px 10px";
       headerMessageContainer.style.marginTop = "4px";
       headerMessageContainer.style.borderTop = "1px solid #f6f6f6";
@@ -259,7 +262,8 @@ var Html5QrcodeScanner = /*#__PURE__*/function () {
       var section = document.createElement("div");
       section.id = this.__getDashboardSectionId();
       section.style.width = "100%";
-      section.style.padding = "10px";
+      section.style.padding = "0px"; // section.style.padding = "10px";
+
       section.style.textAlign = "left";
       dashboard.appendChild(section);
     }
@@ -278,34 +282,34 @@ var Html5QrcodeScanner = /*#__PURE__*/function () {
       var requestPermissionContainer = document.createElement("div");
       requestPermissionContainer.style.textAlign = "center";
       var requestPermissionButton = document.createElement("button");
-      requestPermissionButton.innerHTML = "Request Camera Permissions";
-      requestPermissionButton.addEventListener("click", function () {
-        requestPermissionButton.disabled = true;
+      requestPermissionButton.innerHTML = "Request Camera Permissions"; // requestPermissionButton.addEventListener("click", function () {
 
-        $this.__setStatus("PERMISSION");
+      requestPermissionButton.disabled = true;
 
-        $this.__setHeaderMessage("Requesting camera permissions...");
+      $this.__setStatus("PERMISSION");
 
-        Html5Qrcode.getCameras().then(function (cameras) {
-          $this.__setStatus("IDLE");
+      $this.__setHeaderMessage("Requesting camera permissions...");
 
-          $this.__resetHeaderMessage();
+      Html5Qrcode.getCameras().then(function (cameras) {
+        $this.__setStatus("IDLE");
 
-          if (!cameras || cameras.length == 0) {
-            $this.__setStatus("No Cameras", Html5QrcodeScanner.STATUS_WARNING);
-          } else {
-            scpCameraScanRegion.removeChild(requestPermissionContainer);
+        $this.__resetHeaderMessage();
 
-            $this.__renderCameraSelection(cameras);
-          }
-        })["catch"](function (error) {
-          requestPermissionButton.disabled = false;
+        if (!cameras || cameras.length == 0) {
+          $this.__setStatus("No Cameras", Html5QrcodeScanner.STATUS_WARNING);
+        } else {
+          scpCameraScanRegion.removeChild(requestPermissionContainer);
 
-          $this.__setStatus("IDLE");
+          $this.__renderCameraSelection(cameras);
+        }
+      })["catch"](function (error) {
+        requestPermissionButton.disabled = false;
 
-          $this.__setHeaderMessage(error, Html5QrcodeScanner.STATUS_WARNING);
-        });
-      });
+        $this.__setStatus("IDLE");
+
+        $this.__setHeaderMessage(error, Html5QrcodeScanner.STATUS_WARNING);
+      }); // });
+
       requestPermissionContainer.appendChild(requestPermissionButton);
       scpCameraScanRegion.appendChild(requestPermissionContainer);
       var fileBasedScanRegion = document.createElement("div");
@@ -355,10 +359,12 @@ var Html5QrcodeScanner = /*#__PURE__*/function () {
       var cameraSelectionContainer = document.createElement("span");
       cameraSelectionContainer.innerHTML = "Select Camera (".concat(cameras.length, ") &nbsp;");
       cameraSelectionContainer.style.marginRight = "10px";
+      cameraSelectionContainer.style.fontSize = "4vw";
       var cameraSelectionSelect = document.createElement("select");
       cameraSelectionSelect.id = this.__getCameraSelectionId();
+      cameraSelectionSelect.style.fontSize = "4vw";
 
-      for (var i = 0; i < cameras.length; i++) {
+      for (var i = cameras.length - 1; i >= 0; i--) {
         var camera = cameras[i];
         var value = camera.id;
         var name = camera.label == null ? value : camera.label;
@@ -372,14 +378,44 @@ var Html5QrcodeScanner = /*#__PURE__*/function () {
       scpCameraScanRegion.appendChild(cameraSelectionContainer);
       var cameraActionContainer = document.createElement("span");
       var cameraActionStartButton = document.createElement("button");
+      cameraActionStartButton.style.fontSize = "4vw";
       cameraActionStartButton.innerHTML = "Start Scanning";
       cameraActionContainer.appendChild(cameraActionStartButton);
       var cameraActionStopButton = document.createElement("button");
       cameraActionStopButton.innerHTML = "Stop Scanning";
       cameraActionStopButton.style.display = "none";
+      cameraActionStopButton.style.fontSize = "4vw";
       cameraActionStopButton.disabled = true;
       cameraActionContainer.appendChild(cameraActionStopButton);
-      scpCameraScanRegion.appendChild(cameraActionContainer);
+      scpCameraScanRegion.appendChild(cameraActionContainer); // cameraActionStartButton.addEventListener('click', _ => {
+
+      cameraSelectionSelect.disabled = true;
+      cameraActionStartButton.disabled = true;
+
+      $this._showHideScanTypeSwapLink(false);
+
+      var config = $this.config ? $this.config : {
+        fps: 10,
+        qrbox: 250
+      };
+      var cameraId = cameraSelectionSelect.value;
+      $this.html5Qrcode.start(cameraId, config, $this.qrCodeSuccessCallback, $this.qrCodeErrorCallback).then(function (_) {
+        cameraActionStopButton.disabled = false;
+        cameraActionStopButton.style.display = "inline-block";
+        cameraActionStartButton.style.display = "none";
+
+        $this.__setStatus("Scanning");
+      })["catch"](function (error) {
+        $this._showHideScanTypeSwapLink(true);
+
+        cameraSelectionSelect.disabled = false;
+        cameraActionStartButton.disabled = false;
+
+        $this.__setStatus("IDLE");
+
+        $this.__setHeaderMessage(error, Html5QrcodeScanner.STATUS_WARNING);
+      }); // });
+
       cameraActionStartButton.addEventListener('click', function (_) {
         cameraSelectionSelect.disabled = true;
         cameraActionStartButton.disabled = true;
