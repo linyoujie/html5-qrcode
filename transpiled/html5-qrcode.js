@@ -475,6 +475,8 @@ var Html5Qrcode = /*#__PURE__*/function () {
         };
 
         $this._localMediaStream.getVideoTracks().forEach(function (videoTrack) {
+          $this._localMediaStream.removeTrack(videoTrack);
+
           videoTrack.stop();
           ++tracksClosed;
 

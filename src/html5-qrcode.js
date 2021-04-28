@@ -485,6 +485,7 @@ class Html5Qrcode {
             }
 
             $this._localMediaStream.getVideoTracks().forEach(videoTrack => {
+                $this._localMediaStream.removeTrack(videoTrack);
                 videoTrack.stop();
                 ++tracksClosed;
 
